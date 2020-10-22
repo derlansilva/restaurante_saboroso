@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const menus =  require("../inc/menus")
 
+const menus =  require("../inc/menus")
 const connection = require('../inc/db');
 const reservations = require('../inc/reservations');
 const contacts = require('../inc/contacts');
@@ -24,15 +24,18 @@ router.get('/', function(req, res, next) {
 
 router.get("/contacts" , function(req , res , next){
 
-  contacts.render(req , res);
+    contacts.render(req , res);
 
 })
 
+
+
 router.post('/contacts' , (req , res , next ) => {
+  console.log(req.body)
 
   if(!req.body.name){
 
-    contacts.render(req , res , 'Obrigatorio o nome')
+    contacts.render(req , res , 'Obrigatorio colocar o nome')
 
   }
   else if(!req.body.email){
@@ -48,8 +51,10 @@ router.post('/contacts' , (req , res , next ) => {
 
     contacts.save(req.body).then(results => {
 
-      contacts.render(req , res , null , "Contato enviado com sucesso")
+      req.body = {}
 
+      contacts.render(req , res , null , "Contato enviado com sucesso!")
+      
     }).catch(err => {
 
       contacts.render(req , res  , err.message)
@@ -113,7 +118,9 @@ router.post('/reservations' , (req ,res , next) => {
         reservations.render(req , res , null , "Reserva realizada com sucesso")
 
     }).catch(err => {
+
         reservations.render(req , res , err.message)
+
     })
   }
 
