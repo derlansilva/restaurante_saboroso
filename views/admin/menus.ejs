@@ -63,7 +63,7 @@
     <div class="modal fade" id="modal-create">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00a65a;">
-          <form method="post">
+          <form method="post" action="/admin/menus">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -103,7 +103,7 @@
     <div class="modal fade" id="modal-update">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00c0ef;">
-          <form method="post">
+          <form method="post" action="/admin/menus">
             <input type="hidden" name="id">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -143,43 +143,84 @@
 
 
     <%- include('inc/footer') -%>
+
+    <script src="/js/filereader.js"></script>
+    <script src="/js/formsave.js"></script>
  
 
     <script>
 
+      new Filereader('#modal-create [type=file]' ,'#modal-create img')
+      new Filereader('#modal-update [type=file' ,'#modal-update img')
+
       let formcreate =  document.querySelector('#modal-create form')
 
+        formcreate.save().then(json => {
+          window.location.reload()
+        }).catch(err => {
+          console.log(err)
+        })
 
-      formcreate.addEventListener('submit' , e => {
-         e.preventDefault();
-
-         let formcreateData = new FormData(formcreate)
-
-         fetch('/admin/menus' , {
-           method: 'POST' ,
-           body: formcreateData
-         })
-         .then(response => response.json())
-         .then(json => {
-           //quando salvar atualizar altomaticamente a tela
-            window.location.reload()
-         })
-
-      });
 
 
       let formUpdate = document.querySelector("#modal-update form");
 
+        formUpdate.save().then(json => {
+          window.location.reload()
+        }).catch(err => {
+          console.log(err)
+        });
+
+    //pegar todos os butoes de da classe e torna los um array
+        
+    [...document.querySelectorAll('.btn-delete')].forEach(btn => {
+
+        btn.addEventListener('click' , e => {
+
+            //procurar o id do butao que esta sendo clicado 
+
+                let tr = e.path.find(el => {
+                return(el.tagName.toUpperCase() === 'TR')
+                })
+
+                let data = JSON.parse(tr.dataset.row)
+
+            if(confirm(`Deseja realmente  excluir o menu ${data.title} ? `)){
+                
+                fetch(`/admin/menus/${data.id}` , {
+
+                  method:'DELETE'
+
+                })
+                .then(response => response.json())
+
+                .then( json => {
+                    console.log(json)
+                    window.location.reload()
+                })
+            }
+            
+        })
+
+    });
+
+
      [...document.querySelectorAll('.btn-update')].forEach(btn => {
          btn.addEventListener('click' , e => {
+
             let tr =  e.path.find( el => {
+
                 return(el.tagName.toUpperCase() === 'TR')
+
               })
+              
               let data = JSON.parse(tr.dataset.row)
+              
               for (let name in data){
 
                 switch(name) {
                   case 'photo':
+                    formUpdate.querySelector("img").src = '/'+data[name]
 
                   break;
                   default:
@@ -190,6 +231,7 @@
 
               $('#modal-update').modal('show')
         })
+
 
      });
 

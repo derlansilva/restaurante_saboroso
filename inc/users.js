@@ -1,3 +1,5 @@
+
+const express = require("express")
 const connection = require("./db")
 
 
@@ -53,5 +55,75 @@ const connection = require("./db")
                     }
                 })
             })
+        },
+
+        save(fields){
+            return new Promise((resolve , reject) => {
+
+                let query , params = [
+                    fields.name,
+                    fields.email,
+                    fields.password
+            
+                ];
+
+                if(parseInt(fields.id) > 0){
+
+                    params.push(fields.id)
+
+                    query=`
+
+                        UPDATE tb_users
+                        SET 
+                            name =?,
+                            email =?,
+                            password=?
+
+                        WHERE id =?
+                    `;
+
+                }else{
+
+                    query=`
+
+                    INSERT INTO tb_users (name , email , password) VALUES(?,?,? )
+
+                    `;
+
+                }
+
+                connection.query( query ,params , (err , results) => {
+                    if(err){
+                        console.log(err)
+                        reject(err)
+                    }else{
+                        resolve(results)
+                    }
+                })
+
+            })
+        },
+
+        deleteUser(id){
+            return new Promise((resolve , reject) => {
+                connection.query(`
+                    DELETE FROM tb_users WHERE id=?
+                `, [
+                    id
+                ] , (err , results) => {
+                    if(err){
+                        reject(err)
+                    }else{
+                        resolve(results)
+                    }
+                })
+            })
         }
+
     }
+
+
+    
+
+
+    

@@ -41,6 +41,7 @@ module.exports={
     getParams( req , params ){
         return Object.assign({} ,{
             menus : req.menus ,
+            reservations : req.reservations,
             user: req.session.user
         }, params);
 

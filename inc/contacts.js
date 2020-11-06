@@ -14,20 +14,49 @@ module.exports = {
 
     } ,
 
+    getContacts(){
+        return new Promise((resolve , reject) => {
+            connection.query(`
+                SELECT * FROM tb_contacts
+            `, (err , results) => {
+                if(err){
+                    reject(err)
+                }else{
+                    resolve(results)
+                }
+            })
+        })
+    },
+
     save(fields){
 
         return new Promise((resolve , reject ) => {
+            let query , params = [
+                fields.name ,
+                fields.email
+            ]
+
+
+            if(parseInt(fields.id ) > 0 ){
+
+                query= `
+                    UPDATE tb_contacts 
+                    SET 
+                        name = ?,
+                        email=?
+
+                    WHERE id=?
+                `
+                params.push(fields.id)
+
+            }else{
+                query=`
+                    INSERT INTO tb_contacts (name , email , message)
+                    VALUE(? , ? , ?)
+                `
+            }
             
-            connection.query(`
-                INSERT INTO tb_contacts (name, email , message)
-                VALUE(?,?,?)
-            `, [
-
-                fields.name,
-                fields.email,
-                fields.message
-
-                ] ,(err ,  results) => {
+            connection.query(query , params ,(err ,  results) => {
 
                     if (err ){
 
@@ -42,5 +71,22 @@ module.exports = {
 
         })
 
+    },
+
+    deleteContacts(id){
+        return new Promise((resolve , reject) => {
+            connection.query(`
+                DELETE FROM tb_contacts WHERE id=?
+            
+            `, [
+                id
+            ] , (err , results) =>{
+                if(err){
+                    reject(err)
+                }else{
+                    resolve(results)
+                }
+            })
+        })
     }
 }

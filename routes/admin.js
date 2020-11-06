@@ -1,10 +1,15 @@
 
 
-
 const express = require('express')
 const admin = require('../inc/admin')
 const menus = require('../inc/menus')
 const users = require('../inc/users')
+const reservations = require('../inc/reservations')
+const contacts = require('../inc/contacts')
+const moment = require('moment')
+
+moment.locale('pt-BR')
+
 const router = express.Router()
 
 router.use(function(req , res, next ){
@@ -81,7 +86,22 @@ router.get("/login" , (req , res , next ) => {
 })
 
 router.get('/contacts' ,(req , res , next )=> {
-    res.render("admin/contacts" , admin.getParams(req))
+    contacts.getContacts().then( data => {
+
+        res.render("admin/contacts" , admin.getParams(req , {
+            data
+        }))
+
+    })
+})
+
+
+router.delete('/contacts/:id', (req, res ,next ) => {
+    contacts.deleteContacts(req.params.id).then(results => {
+        res.send(results)
+    }).catch(err => {
+        res.send(err)
+    })
 })
 
 
@@ -108,11 +128,54 @@ router.post('/menus' , (req , res , next ) => {
    
 })
 
+router.delete('/menus/:id' , function(req , res , next){
+    menus.deleteMenus(req.params.id).then(results => {
 
-router.get('/reservations' , ( req , res , next ) => {
-    res.render('admin/reservations',  admin.getParams(req , {date: {}}))
+        res.send(results)
+
+    }).catch(err => {
+
+        res.send(err)
+
+    })
 })
 
+
+router.get('/reservations' , ( req , res , next ) => {
+    reservations.getReservations().then(data =>
+        { res.render('admin/reservations' , admin.getParams(req, 
+            {
+                date: {},
+                data,
+                moment
+             }
+        )
+        )
+    })
+    
+    
+})
+
+router.post('/reservations' ,(req , res , next ) => {
+
+    reservations.save( req.fields , req.files ).then(results => {
+
+        res.send(results)
+
+    }).catch(err => {
+        res.send(err)
+    })
+})
+
+router.delete('/reservations/:id' , (req , res , next) => {
+
+    reservations.deleteReservations(req.params.id).then(results => {
+        res.send(results)
+    }).catch(err => {
+        res.send(err)
+    })
+
+})
 
 router.get('/users' , ( req , res , next ) => {
     users.getUsers().then(user => {
@@ -121,5 +184,27 @@ router.get('/users' , ( req , res , next ) => {
         })) 
     })
 })
+
+router.post('/users' , (req , res , next ) => {
+
+    users.save(req.fields).then(results   => {
+
+        res.send(results)
+
+    }).catch(err => {
+
+        res.send(err)
+
+    })
+})
+
+router.delete('/users/:id', (req , res ,next ) => {
+    users.deleteUser(req.params.id).then(results => {
+        res.send(results)
+    }).catch(err => {
+        res.send(err)
+    })
+})
+
 
 module.exports = router
