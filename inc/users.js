@@ -60,27 +60,27 @@ const connection = require("./db")
         save(fields){
             return new Promise((resolve , reject) => {
 
+                console.log(' salvar ou update')
                 let query , params = [
                     fields.name,
-                    fields.email,
-                    fields.password
+                    fields.email
             
                 ];
 
                 if(parseInt(fields.id) > 0){
 
-                    params.push(fields.id)
+                    console.log('update')
 
                     query=`
 
                         UPDATE tb_users
                         SET 
                             name =?,
-                            email =?,
-                            password=?
+                            email =?
 
                         WHERE id =?
                     `;
+                    params.push(fields.id)
 
                 }else{
 
@@ -89,6 +89,8 @@ const connection = require("./db")
                     INSERT INTO tb_users (name , email , password) VALUES(?,?,? )
 
                     `;
+
+                    params.push(fields.password)
 
                 }
 
@@ -117,6 +119,33 @@ const connection = require("./db")
                         resolve(results)
                     }
                 })
+            })
+        },
+
+        changePassword(req){
+            return new Promise((resolve , reject) => {
+                //aqui confirma se os dois campos para auterar senha são identicos
+                if(!req.fields.password){
+                    reject("Preencha a senha")
+                }else if(req.fields.password !== req.fields.passwordConfirm ){
+                    reject("As senha não batem")
+                }else{
+                    connection.query(`
+                        UPDATE tb_users
+                        SET 
+                            password =?
+                        WHERE id=?
+                    ` , [
+                        req.fields.password,
+                        req.fields.id
+                    ], (err , results) => {
+                        if(err){
+                            reject(err.message)
+                        }else{
+                            resolve(results)
+                        }
+                    }) 
+                }
             })
         }
 

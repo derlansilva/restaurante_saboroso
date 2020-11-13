@@ -33,7 +33,8 @@ module.exports = {
         return new Promise((resolve , reject ) => {
             let query , params = [
                 fields.name ,
-                fields.email
+                fields.email,
+                fields.message
             ]
 
 
@@ -43,7 +44,8 @@ module.exports = {
                     UPDATE tb_contacts 
                     SET 
                         name = ?,
-                        email=?
+                        email=?,
+                        message = ?
 
                     WHERE id=?
                 `
@@ -51,8 +53,8 @@ module.exports = {
 
             }else{
                 query=`
-                    INSERT INTO tb_contacts (name , email , message)
-                    VALUE(? , ? , ?)
+                    INSERT INTO tb_contacts(name , email , message)
+                    VALUES(?,?,?)
                 `
             }
             
@@ -60,6 +62,7 @@ module.exports = {
 
                     if (err ){
 
+                        console.log(err)
                         reject(err)
 
                     }else {

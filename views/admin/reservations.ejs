@@ -54,7 +54,7 @@
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th style="width: 10px">#</th>
+                  <th style="width: 10px">Id</th>
                   <th>Nome</th>
                   <th>E-mail</th>
                   <th>Pessoas</th>
@@ -208,89 +208,31 @@
     <script src="/js/moment.min.js"></script>
     <script src="/js/formsave.js"></script>
 
+    <script src="/js/grid.js"></script>
     <script>
 
-      let formcreate = document.querySelector('#modal-create form')
+      //aqui as configurações são passadas  para a class grid
 
-      formcreate.save().then(json => {
-        window.location.reload()
-      }).catch(err =>{
-        console.log(err)
-      })
+      new Grid({
+        deleteUrl : '/admin/reservations/${data.id}',
+        deleteMsg : 'Deseja realmente excluir a reserva de ${data.name} ?',
+        onUpdateLoad: (formUpdate , name , data) => {
 
+        let input = formUpdate.querySelector(`[name=${name}]`)
 
-      let formUpdate = document.querySelector('#modal-update form')
+              switch(name){
+                
+                  case 'date':
 
-        formUpdate.save().then( json => {
+                      if(input) input.value = moment(data[name]).format('YYYY-MM-DD')
+                      break;
 
-          window.location.reload()
-
-        }).catch(err => {
-          console.log(err)
-        });
-
-
-      [...document.querySelectorAll('.btn-delete')].forEach(btn => {
-        btn.addEventListener('click' , e => {
-          
-
-          let tr = e.path.find(el => {
-            return (el.tagName.toUpperCase() === 'TR')
-          })
-
-          let data = JSON.parse(tr.dataset.row)
-
-          if(confirm(`Deseja excluir a reserva  de ${data.name}?`)){
-
-            fetch(`/admin/reservations/${data.id}` , 
-            {
-              method : 'DELETE'
-            })
-            .then(response => response.json() )
-              .then(json => {
-               
-                window.location.reload()
-              })
-          }
-
-        })
-      });
-
-      [...document.querySelectorAll('.btn-update')].forEach(btn => {
-
-        btn.addEventListener('click' , e => {
-
-          let tr  = e.path.find( el => {
-
-            return(el.tagName.toUpperCase() === 'TR')
-
-          })
-
-          let data = JSON.parse(tr.dataset.row)
-
-
-          for (let name in data){
-
-            let input = formUpdate.querySelector(`[name=${name}`)
-
-            switch(name){
-
-              case 'date':
-                if(input) input.value = moment(data[name]).format('YYYY-MM-DD')
-
-                break
+                  default:
+                      if(input) input.value = data[name];
+                  
+              }
               
-              default:
-
-                if(input)input.value = data[name]
-
-            }
-
-          }
-
-          $('#modal-update').modal('show')
-
-        })
+        }
       })
 
     </script>

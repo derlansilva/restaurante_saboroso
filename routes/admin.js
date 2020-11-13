@@ -178,9 +178,9 @@ router.delete('/reservations/:id' , (req , res , next) => {
 })
 
 router.get('/users' , ( req , res , next ) => {
-    users.getUsers().then(user => {
+    users.getUsers().then(data => {
         res.render('admin/users' , admin.getParams(req , {
-            user
+            data
         })) 
     })
 })
@@ -197,6 +197,17 @@ router.post('/users' , (req , res , next ) => {
 
     })
 })
+
+router.post('/users/password-change' , (req , res , next ) => {
+    users.changePassword(req).then(results => {
+        res.send(results)
+    }).catch(err => {
+        res.send({
+            error: err
+        })
+    })
+})
+
 
 router.delete('/users/:id', (req , res ,next ) => {
     users.deleteUser(req.params.id).then(results => {

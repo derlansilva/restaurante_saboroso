@@ -27,7 +27,7 @@
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th style="width: 10px">#</th>
+                  <th style="width: 10px">Id</th>
                   <th>Foto</th>
                   <th>Título</th>
                   <th>Descrição</th>
@@ -146,6 +146,7 @@
 
     <script src="/js/filereader.js"></script>
     <script src="/js/formsave.js"></script>
+    <script src="/js/grid.js"></script>
  
 
     <script>
@@ -153,86 +154,28 @@
       new Filereader('#modal-create [type=file]' ,'#modal-create img')
       new Filereader('#modal-update [type=file' ,'#modal-update img')
 
-      let formcreate =  document.querySelector('#modal-create form')
+      new Grid({
+        deleteUrl : '/admin/menus/${data.id}',
+        deleteMsg: 'Deseja realmente  excluir o menu ${data.title} ?',
+        onUpdateLoad: (formUpdate , name , data) => {
 
-        formcreate.save().then(json => {
-          window.location.reload()
-        }).catch(err => {
-          console.log(err)
-        })
+            let input = formUpdate.querySelector(`[name=${name}]`)
 
+                  switch(name){
 
+                      case 'photo':
 
-      let formUpdate = document.querySelector("#modal-update form");
+                          formUpdate.querySelector("img").src = '/'+data[name]
 
-        formUpdate.save().then(json => {
-          window.location.reload()
-        }).catch(err => {
-          console.log(err)
-        });
+                          break;
 
-    //pegar todos os butoes de da classe e torna los um array
-        
-    [...document.querySelectorAll('.btn-delete')].forEach(btn => {
-
-        btn.addEventListener('click' , e => {
-
-            //procurar o id do butao que esta sendo clicado 
-
-                let tr = e.path.find(el => {
-                return(el.tagName.toUpperCase() === 'TR')
-                })
-
-                let data = JSON.parse(tr.dataset.row)
-
-            if(confirm(`Deseja realmente  excluir o menu ${data.title} ? `)){
-                
-                fetch(`/admin/menus/${data.id}` , {
-
-                  method:'DELETE'
-
-                })
-                .then(response => response.json())
-
-                .then( json => {
-                    console.log(json)
-                    window.location.reload()
-                })
-            }
-            
-        })
-
-    });
-
-
-     [...document.querySelectorAll('.btn-update')].forEach(btn => {
-         btn.addEventListener('click' , e => {
-
-            let tr =  e.path.find( el => {
-
-                return(el.tagName.toUpperCase() === 'TR')
-
-              })
-              
-              let data = JSON.parse(tr.dataset.row)
-              
-              for (let name in data){
-
-                switch(name) {
-                  case 'photo':
-                    formUpdate.querySelector("img").src = '/'+data[name]
-
-                  break;
-                  default:
-                    let input = formUpdate.querySelector(`[name=${name}]`)
-                    if(input) input.value = data[name];
-                }
-              }
-
-              $('#modal-update').modal('show')
-        })
-
-
-     });
+                      default:
+                          if(input) input.value = data[name];
+                      
+                  }
+                  
+          }
+      })
+   
 
     </script>
