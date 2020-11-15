@@ -59,34 +59,13 @@
 <%- include('inc/footer') -%>
 
 <script src="/js/formsave.js"></script>
+<script src="/js/grid.js"></script>
 
 <script>
 
-  [...document.querySelectorAll('.btn-delete')].forEach(btn => {
-    btn.addEventListener('click' , e => {
-      
-      let tr = e.path.find( el => {
-        return(el.tagName.toUpperCase() === 'TR' )
-      })
-
-      let data = JSON.parse(tr.dataset.row)
-      console.log(data)
-
-      if(confirm(`Deseja mesmo excluir o contado de ${data.name} ?`)){
-
-        fetch(`/admin/contacts/${data.id}` , {
-
-            method: 'DELETE'
-
-        })
-          .then(response => response.json())
-          .then(json => {
-            console.log(json)
-            window.location.reload()
-          })
-          
-      }
-
-    })
+  new Grid({
+    deleteUrl:'/admin/contacts/${data.id}',
+    deleteMsg: 'Deseja mesmo excluir o contado de ${data.name} ?'
   })
+
 </script>

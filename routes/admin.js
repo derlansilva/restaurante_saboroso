@@ -7,6 +7,7 @@ const users = require('../inc/users')
 const reservations = require('../inc/reservations')
 const contacts = require('../inc/contacts')
 const moment = require('moment')
+const emails = require('../inc/emails')
 
 moment.locale('pt-BR')
 
@@ -106,9 +107,22 @@ router.delete('/contacts/:id', (req, res ,next ) => {
 
 
 router.get('/emails' , (req , res , next ) => {
-    res.render('admin/emails' , admin.getParams(req))
+    emails.getEmail().then(data => {
+
+        res.render("admin/emails" , admin.getParams(req , {
+            data
+        }))
+
+    })
 })
 
+router.delete('/emails/:id' , (req , res , next ) => {
+    emails.deleteEmails(req.params.id).then(results => {
+        res.send(results)
+    }).catch(err => {
+        res.send(err)
+    })
+})
 
 router.get('/menus' , (req , res , next ) => {
 
@@ -142,12 +156,20 @@ router.delete('/menus/:id' , function(req , res , next){
 
 
 router.get('/reservations' , ( req , res , next ) => {
-    reservations.getReservations().then(data =>
-        { res.render('admin/reservations' , admin.getParams(req, 
+
+    let start =  (req.query.start) ? req.query.start : moment().subtract( 1 , "year").format("YYYY-MM-DD")
+    let end =    (req.query.end) ? req.query.end : moment().format("YYYY-MM-DD")
+
+    reservations.getReservations(req).then(pag =>{
+         res.render('admin/reservations' , admin.getParams(req, 
             {
-                date: {},
-                data,
-                moment
+                date: {
+                    start,
+                    end
+                },
+                data: pag.data,
+                moment,
+                links : pag.links 
              }
         )
         )

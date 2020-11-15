@@ -5,6 +5,7 @@ const menus =  require("../inc/menus")
 const connection = require('../inc/db');
 const reservations = require('../inc/reservations');
 const contacts = require('../inc/contacts');
+const email = require('../inc/emails')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -64,6 +65,21 @@ router.post('/contacts' , (req , res , next ) => {
   }
 
 })
+
+router.post('/subscribe' , (req , res , next ) => {
+
+
+    email.save(req).then(results => {
+
+      res.send(results)
+      
+    }).catch(err => {
+      
+      res.send(err)
+
+    })
+})
+
 
 router.get('/menus' , (req , res ,next )=>{
 
