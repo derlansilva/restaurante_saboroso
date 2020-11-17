@@ -1,4 +1,3 @@
-
 const connection = require("./db");
 const Pagination = require("./pagination");
 
@@ -33,11 +32,13 @@ module.exports ={
 
             let pag = new Pagination(
                 //SELECIONE TUDO DA TABELA POR ORDEM NAME COM LIMITE DE ATE 
+                //TRECHO PARA FILTRAR RESERVAS COM MYSQL
                 `SELECT SQL_CALC_FOUND_ROWS * 
                 FROM tb_reservations
                 ${( dtstart && dtend ) ? 'WHERE date BETWEEN ? AND ?' : ''} 
                 ORDER BY name LIMIT ? ,?
                 `,
+                //LINHA 38 IF TERNARIO SE DTSTART E DTEND EXISTIR MOSTRE WHERE SE NÃO 
                 params
                 //AQUI O TOTAL DE ITENS POR PAGINA
             )

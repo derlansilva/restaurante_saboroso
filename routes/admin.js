@@ -157,8 +157,9 @@ router.delete('/menus/:id' , function(req , res , next){
 
 router.get('/reservations' , ( req , res , next ) => {
 
-    let start =  (req.query.start) ? req.query.start : moment().subtract( 1 , "year").format("YYYY-MM-DD")
-    let end =    (req.query.end) ? req.query.end : moment().format("YYYY-MM-DD")
+    //SE  QUERY.START FOR TRUE , SE NÃO
+    let start =  (req.query.start) ? req.query.start : moment().subtract( 1 , "year").format("YYYY-MM-DD")//data inicial 
+    let end =    (req.query.end) ? req.query.end : moment().format("YYYY-MM-DD") //data final 
 
     reservations.getReservations(req).then(pag =>{
          res.render('admin/reservations' , admin.getParams(req, 
@@ -169,7 +170,7 @@ router.get('/reservations' , ( req , res , next ) => {
                 },
                 data: pag.data,
                 moment,
-                links : pag.links 
+                links : pag.links  
              }
         )
         )

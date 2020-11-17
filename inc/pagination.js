@@ -9,7 +9,7 @@ class Pagination {
         //aqui são passados os parametros para a classe que ira fazer a paginação
         query ,
         params = [],
-        itensPerPage = 10
+        itensPerPage = 15
     ){
 
         this.query = query;
@@ -41,7 +41,7 @@ class Pagination {
                     this.totalPages = Math.ceil(this.total / this.itensPerPage); //função matematica que sempre converte para cima
                     this.currentPage++;
 
-                    console.log(this.total)
+                    console.log("total de reservas"+this.total)
                     resolve( this.data )
                 }
             })
@@ -92,6 +92,12 @@ class Pagination {
             nrstart = this.getCurrentPage() - parseInt(limitPagesNav / 2)
             nrend =   this.getCurrentPage() + parseInt(limitPagesNav/2)
         }
+        if(this.getCurrentPage() > 1){
+            links.push({
+                text: '<' ,
+                href: '?' +  this.getQueryString(Object.assign({} , params , {page : this.getCurrentPage() -1 }))
+            });
+        }
 
         for (let x = nrstart; x <= nrend ; x++ ){
 
@@ -103,10 +109,18 @@ class Pagination {
 
         }
 
+        if(this.getCurrentPage() < this.getTotalPages()){
+            links.push({
+                text: '>' ,
+                href: '?'+ this.getQueryString(Object.assign({} , params , { page : this.getCurrentPage() +1 }))
+            })
+        }
+
         return links
 
     }
 
+    //aqui convertamos um json em formato query string
     getQueryString(params){
         let querystring = [] ;
 
