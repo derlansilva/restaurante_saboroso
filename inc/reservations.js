@@ -1,5 +1,6 @@
 const connection = require("./db");
 const Pagination = require("./pagination");
+const moment = require('moment')
 
 
 module.exports ={
@@ -134,7 +135,73 @@ module.exports ={
                 }
             })
         })
+    },
+
+    //metodo para exibir dados do banco no grafico reservas
+    chart(req){
+
+        return new Promise((resolve , reject ) => {
+            connection.query(`
+            SELECT 
+                CONCAT(YEAR(date) , '-' , MONTH(date)) AS date,
+                COUNT(*) AS total,
+                SUM(people) / COUNT(*) AS avg_people
+            FROM tb_reservations
+            WHERE
+                date BETWEEN ? AND ?
+            GROUP BY YEAR(date)  , MONTH(date) 
+            ORDER BY YEAR(date) DESC , MONTH(date) DESC;
+            `,[
+                //aqui sao passados os parametros que ficaram nas interrogações
+                req.query.start,
+                req.query.end
+            ] , (err , results) => {
+                if(err) {
+                    reject(err)
+                    console.log(err)
+                }else{
+
+                    let months = [];
+                    let values = [];
+
+                    results.forEach(row => {
+                        months.push(moment(row.date).format('MMM YYYY'))
+                        values.push(row.total)
+                    });
+                    resolve({
+                        months,
+                        values
+                    })
+                }
+            })
+        })
+
+    },
+
+    conct(req){
+        
+        return new Promise((resolve , reject) => {
+            connection.query(`
+                SELECT
+                    CONCAT(YEAR(date) , '-' , MONTH(date)) AS date,
+                    COUNT(*) AS total,
+                    SUM(people) / COUNT(*) AS avg_people
+                FROM 
+                    tb_reservations
+                WHERE
+                    date BETWEEEN ? AND ?
+
+                GROUP BY YEAR(date) , MONTH(date)
+                ORDER BY YEAR(date) DESC , MONTH(date) DESC ;
+            `)
+        })
+
     }
+
+
+
+
+
 
    
 
