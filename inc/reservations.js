@@ -177,32 +177,22 @@ module.exports ={
         })
 
     },
-
-    conct(req){
-        
-        return new Promise((resolve , reject) => {
+    dashboard(){
+         return new Promise((resolve , reject ) => {
             connection.query(`
-                SELECT
-                    CONCAT(YEAR(date) , '-' , MONTH(date)) AS date,
-                    COUNT(*) AS total,
-                    SUM(people) / COUNT(*) AS avg_people
-                FROM 
-                    tb_reservations
-                WHERE
-                    date BETWEEEN ? AND ?
-
-                GROUP BY YEAR(date) , MONTH(date)
-                ORDER BY YEAR(date) DESC , MONTH(date) DESC ;
-            `)
+            SELECT
+                (SELECT COUNT(*) FROM tb_contacts) AS nrcontacts,
+                (SELECT COUNT(*) FROM tb_menus) AS nrmenus,
+                (SELECT COUNT(*) FROM tb_reservations) AS nrreservations,
+                (SELECT COUNT(*) FROM tb_users)AS nrusers;
+            `, (err , results)=> {
+                if(err){
+                    reject(err)
+                }else{
+                    resolve(results[0])
+                }
+            })
         })
-
-    }
-
-
-
-
-
-
-   
+     }
 
 }
